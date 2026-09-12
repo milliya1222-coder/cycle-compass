@@ -119,6 +119,31 @@
             text-transform:uppercase; color:var(--rose); display:block; margin-bottom:.55rem}
   .圖騰 p{font-size:.85rem; line-height:2; color:var(--moon-dim)}
 
+  /* ── 關於我 ── */
+  .關於{margin-top:4.6rem; padding-top:2.6rem; border-top:1px solid var(--line); text-align:center}
+  .關於 img{width:96px; height:auto; margin-bottom:1.1rem}
+  .關於 h2{margin:.2rem 0 .3rem; font-weight:500; font-size:1.3rem; letter-spacing:.2em}
+  .關於 .slogan{color:var(--rose); font-size:.95rem; letter-spacing:.1em; margin-bottom:1.6rem}
+  .關於 .bio{text-align:left; font-size:.92rem; line-height:2.1; color:var(--moon-dim)}
+  .關於 .bio strong{color:var(--moon); font-weight:500}
+  .關於 .bio + .bio{margin-top:1.1rem}
+
+  .服務{list-style:none; margin:2.4rem 0 0; padding:0; text-align:left;
+        display:grid; gap:1px; background:var(--line); border-block:1px solid var(--line)}
+  .服務 a{display:block; padding:1.1rem .2rem; background:#191527; text-decoration:none; color:inherit;
+          transition:background .3s}
+  .服務 a:hover{background:#221D33}
+  .服務 .名{font-size:1rem; letter-spacing:.1em}
+  .服務 .名::after{content:" →"; color:var(--gold); font-size:.8em; opacity:.7}
+  .服務 .說{display:block; margin-top:.25rem; font-family:var(--gothic);
+            font-size:.76rem; line-height:1.9; color:var(--moon-dim)}
+
+  .聯絡{margin-top:1.8rem; display:flex; flex-wrap:wrap; justify-content:center; gap:.6rem}
+  .聯絡 a{font-family:var(--gothic); font-size:.74rem; letter-spacing:.12em; text-decoration:none;
+          color:var(--moon); padding:.55rem 1.1rem; border:1px solid var(--line); border-radius:999px;
+          transition:border-color .3s, background .3s}
+  .聯絡 a:hover{border-color:var(--gold); background:rgba(201,169,97,.12)}
+
   /* ── Womb-Moon 徽記 ── */
   /* 月亮會飄到這一帶，所以給徽記一圈自己的暗場，不然白線會被月光吃掉 */
   .徽記{position:relative; margin-top:4.4rem; text-align:center}
@@ -190,6 +215,53 @@
       每個月的那一輪，是同一件事的小版本。
     </p>
     <div class="三圖" id="三圖"></div>
+  </section>
+
+  <!-- ⑤ 關於我 -->
+  <section class="關於">
+    <img class="reveal" src="milliya-icon.png" alt="Birth with Milliya" width="400" height="455" loading="lazy">
+    <p class="eyebrow reveal">About</p>
+    <h2 class="reveal">欣妙 ・ Milliya</h2>
+    <p class="slogan reveal">陪妳生，也陪妳生出新的自己</p>
+
+    <p class="bio reveal">
+      Birth with Milliya・欣妙在陪妳工作室創辦人，兩個孩子的母親。
+      溫柔生產陪產員（Doula）、EmbodyBirth 覺知分娩倡導者、
+      獨立生產顧問（Radical Birth Keeper）、Womb-Moon 認證女人圈引導師。
+      陪過二十多個家庭迎接他們的孩子。在日本湘南，也在線上。
+    </p>
+    <p class="bio reveal">
+      <strong>兩次溫柔的生產讓我知道一件事：女人在被信任、被支持的時候，生命會自己打開。</strong>
+      所以我做的事其實只有一件——陪著妳，直到妳想起自己本來就會。
+    </p>
+
+    <ul class="服務 reveal">
+      <li><a href="https://birthwithmilliya.com/doula/" target="_blank" rel="noopener">
+        <span class="名">溫柔生產陪產</span>
+        <span class="說">從孕期陪到產後。在場，但不主導——那是妳的生產，不是我的。</span></a></li>
+      <li><a href="https://birthwithmilliya.com/education/" target="_blank" rel="noopener">
+        <span class="名">孕產教育</span>
+        <span class="說">先讓妳知道自己有哪些選擇，然後妳自己選。</span></a></li>
+      <li><a href="https://milliya1222-coder.github.io/Ayurvedic-care/" target="_blank" rel="noopener">
+        <span class="名">阿育吠陀產後照顧</span>
+        <span class="說">產後那段常常沒人接住的時間，我用手接住。</span></a></li>
+      <li><a href="https://birthwithmilliya.com/coaching/" target="_blank" rel="noopener">
+        <span class="名">女性身心靈教練</span>
+        <span class="說">不只是生孩子，也是生出那個新的妳。</span></a></li>
+      <li><a href="https://birthwithmilliya.com/wombmoon/" target="_blank" rel="noopener">
+        <span class="名">Womb-Moon 神聖女人圈</span>
+        <span class="說">當女人聚在一起，魔法就會發生。這個羅盤的四夜，就是從這裡來的。</span></a></li>
+      <li><a href="https://birthwithmilliya.com/guide/" target="_blank" rel="noopener">
+        <span class="名">生產方式選擇手冊</span>
+        <span class="說">免費。給還在決定要怎麼生的妳。</span></a></li>
+    </ul>
+
+    <div class="聯絡 reveal">
+      <a href="https://birthwithmilliya.com/" target="_blank" rel="noopener">官方網站</a>
+      <a href="https://line.me/R/ti/p/@859uhxmv" target="_blank" rel="noopener">LINE 聊聊</a>
+      <a href="https://instagram.com/birth.with.milliya" target="_blank" rel="noopener">Instagram</a>
+      <a href="mailto:birthwithmilliya@gmail.com">Email</a>
+    </div>
   </section>
 
   <div class="徽記 reveal">
@@ -548,9 +620,17 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
       r: Math.random() * 1 + .3, a: Math.random() * .5 + .25,
       速: Math.random() * .0015 + .0004, 相: Math.random() * Math.PI * 2,
     }));
-    月R = Math.max(72, Math.min(Math.min(寬, 高) * .21, 172));
-    月X = 寬 * .72; 月Y = 高 * .3;
+    月R = Math.max(78, Math.min(Math.min(寬, 高) * .235, 190));
+    月X = 寬 * .68; 月Y = 高 * .3;              // .68 是為了讓 R 再大也不會被右邊切到
   }
+
+  // 月海：位置固定的七塊暗斑。有它們，月亮才是「那一顆」，不是一個發光的圓
+  const 月海 = [
+    { x:-.32, y:-.30, r:.32, a:.115 }, { x: .10, y:-.46, r:.23, a:.080 },
+    { x: .30, y: .08, r:.36, a:.095 }, { x:-.14, y: .36, r:.27, a:.075 },
+    { x:-.48, y: .12, r:.19, a:.060 }, { x: .06, y:-.04, r:.17, a:.055 },
+    { x: .40, y:-.34, r:.14, a:.045 },
+  ];
 
   // phase：0＝新月、.25＝上弦、.5＝滿月、.75＝下弦
   function 畫月(c, cx, cy, R, phase, alpha){
@@ -567,22 +647,50 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
       c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * 倍, 0, 7); c.fill();
     });
 
-    // 暗面＝地球反照，帶一點藍，讓它看起來是顆球而不是貼紙
+    // 月暈：極細的一圈。有它，才像是隔著空氣在看月亮
+    c.beginPath(); c.arc(cx, cy, R * 2.18, 0, 7);
+    c.strokeStyle = `rgba(248,241,230,${(.05 * 亮度 + .018).toFixed(3)})`;
+    c.lineWidth = Math.max(1, R * .011); c.stroke();
+
+    // 暗面＝地球反照。帶一點藍的闇，讓它看起來是顆球，不是貼紙
     const 暗 = c.createRadialGradient(cx - R * .28, cy - R * .28, R * .05, cx, cy, R * 1.05);
-    暗.addColorStop(0, 'rgba(158,152,190,.20)'); 暗.addColorStop(1, 'rgba(96,92,124,.06)');
+    暗.addColorStop(0, 'rgba(158,152,190,.22)');
+    暗.addColorStop(.6, 'rgba(128,122,158,.13)');
+    暗.addColorStop(1, 'rgba(96,92,124,.07)');
     c.fillStyle = 暗; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
-    c.beginPath(); c.arc(cx, cy, R - .6, 0, 7);
-    c.strokeStyle = 'rgba(248,241,230,.14)'; c.lineWidth = Math.max(.7, R * .007); c.stroke();
+    // 暗面的邊。有這條線，才看得出來是「圓的」
+    c.beginPath(); c.arc(cx, cy, R - Math.max(.5, R * .006), 0, 7);
+    c.strokeStyle = 'rgba(248,241,230,.20)'; c.lineWidth = Math.max(.7, R * .008); c.stroke();
 
     // 亮面：半圓 + 一段橢圓，就是月相的形狀
     c.save(); c.beginPath();
     c.arc(cx, cy, R, 盈 ? -Math.PI / 2 : Math.PI / 2, 盈 ? Math.PI / 2 : -Math.PI / 2, false);
     c.ellipse(cx, cy, R * Math.abs(cos), R, 0, 盈 ? Math.PI / 2 : -Math.PI / 2, 盈 ? -Math.PI / 2 : Math.PI / 2, cos > 0);
     c.closePath(); c.clip();
-    const 光 = c.createRadialGradient(cx + (盈 ? R * .4 : -R * .4), cy - R * .2, R * .04, cx, cy, R * 1.14);
+
+    // 球面的明暗：光來的那一側最白，往反邊的緣落下去
+    const 光 = c.createRadialGradient(cx + (盈 ? R * .40 : -R * .40), cy - R * .20, R * .04, cx, cy, R * 1.14);
     光.addColorStop(0, '#FAF4EA'); 光.addColorStop(.5, '#F0E5D4');
     光.addColorStop(.82, '#E2D2BB'); 光.addColorStop(1, '#CFBCA3');
     c.fillStyle = 光; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
+
+    // 月海。位置固定，所以每次升起來都是同一張臉；太小就不畫，會糊成一團
+    if (R > 46) for (const m of 月海){
+      const mx = cx + m.x * R, my = cy + m.y * R, mr = m.r * R;
+      const g = c.createRadialGradient(mx, my, 0, mx, my, mr);
+      g.addColorStop(0, `rgba(120,112,138,${m.a})`);
+      g.addColorStop(.7, `rgba(120,112,138,${(m.a * .45).toFixed(3)})`);
+      g.addColorStop(1, 'rgba(120,112,138,0)');
+      c.fillStyle = g; c.beginPath(); c.arc(mx, my, mr, 0, 7); c.fill();
+    }
+
+    // 明暗交界柔化。半月時也不要出現一條硬邊
+    const 寬 = Math.max(R * Math.abs(cos), R * .16);
+    const 交界 = c.createLinearGradient(cx - 寬, cy, cx + 寬, cy);
+    if (盈){ 交界.addColorStop(0, 'rgba(24,20,34,.34)'); 交界.addColorStop(.45, 'rgba(24,20,34,.10)'); 交界.addColorStop(1, 'rgba(24,20,34,0)'); }
+    else   { 交界.addColorStop(0, 'rgba(24,20,34,0)'); 交界.addColorStop(.55, 'rgba(24,20,34,.10)'); 交界.addColorStop(1, 'rgba(24,20,34,.34)'); }
+    c.fillStyle = 交界; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
+
     c.restore(); c.restore();
   }
 
@@ -607,9 +715,11 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
 
   function 畫(t){
     const p = 捲動比例();
-    const 相 = p * .5;                               // 從頭捲到底＝新月走到滿月
+    // 從頭捲到底＝從一彎細細的月，長到滿月。
+    // 起點刻意不用正零——全黑的新月在畫面上只剩一團光暈，少了那道弦就沒東西可看。
+    const 相 = .055 + p * .445;
     // 進入內文後讓月亮退開，字才好讀；越接近頁尾再退一點，把版面讓給圖騰與徽記
-    const 濃 = (.58 - .3 * Math.min(scrollY / (innerHeight * .9), 1)) * (1 - .35 * p);
+    const 濃 = (.70 - .32 * Math.min(scrollY / (innerHeight * .9), 1)) * (1 - .28 * p);
 
     // 夜色跟著月亮變暖：越滿越暖
     const 混 = (a, b) => Math.round(a + (b - a) * p);
