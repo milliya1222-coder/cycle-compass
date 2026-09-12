@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>週期羅盤 ・ Womb-Moon</title>
+<title>神聖週期羅盤 ・ Sacred Cycle Compass</title>
 <meta name="description" content="跟著身體的週期，或天上的月亮，找到今天妳在哪一夜。">
 <meta name="theme-color" content="#14121C">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="週期羅盤">
+<meta name="apple-mobile-web-app-title" content="神聖週期羅盤">
 
 <style>
   :root{
@@ -43,7 +43,9 @@
     .reveal{opacity:1; transform:none; transition:none}
   }
   p{margin:0}
-  h1{font-weight:500; font-size:1.6rem; letter-spacing:.16em; margin:0 0 .4rem; line-height:1.6}
+  h1{font-weight:500; font-size:1.6rem; letter-spacing:.16em; margin:0 0 .35rem; line-height:1.6}
+  .h1sub{font-family:var(--gothic); font-size:.64rem; letter-spacing:.22em;
+         text-transform:uppercase; color:var(--moon-dim); margin-bottom:1rem}
   .eyebrow{font-family:var(--gothic); font-size:.66rem; font-weight:500;
            letter-spacing:.26em; text-transform:uppercase; color:var(--gold); margin-bottom:.7rem}
   .lede{color:var(--moon-dim); font-size:.88rem; line-height:2.1}
@@ -155,7 +157,8 @@
 <div class="col">
 
   <p class="eyebrow">Womb ・ Moon ・ Alchemy</p>
-  <h1>週期羅盤</h1>
+  <h1>神聖週期羅盤</h1>
+  <p class="h1sub">Sacred Cycle Compass ・ for women</p>
   <p class="lede">
     妳的身體，一個月裡並不是同一個人。有滿的時候，有縮回去的時候，也有要放掉的時候。<br>
     這裡不是要把那個起伏修好，是讓它變成一張看得懂的地圖。
@@ -571,7 +574,9 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
 
   function 建置(){
     const dpr = Math.min(devicePixelRatio || 1, 2);
-    寬 = 畫布.clientWidth; 高 = 畫布.clientHeight;
+    // 頁面若在隱藏或尚未佈局時載入，clientWidth 會是 0，畫布就永遠是空的——退回視窗尺寸
+    寬 = 畫布.clientWidth || innerWidth || 360;
+    高 = 畫布.clientHeight || innerHeight || 640;
     畫布.width = 寬 * dpr; 畫布.height = 高 * dpr;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     星 = Array.from({ length: Math.round(Math.min(寬 * 高 / 5600, 260)) }, () => ({
@@ -583,13 +588,49 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
     月X = 寬 * .68; 月Y = 高 * .3;              // .68 是為了讓 R 再大也不會被右邊切到
   }
 
-  // 月海：位置固定的七塊暗斑。有它們，月亮才是「那一顆」，不是一個發光的圓
+  /* ── 月面 ──────────────────────────────────────
+     近側月海照真實位置排布（座標以月半徑為 1）。有它們，
+     月亮才是「那一顆」，不是一個發光的圓。 */
   const 月海 = [
-    { x:-.32, y:-.30, r:.32, a:.115 }, { x: .10, y:-.46, r:.23, a:.080 },
-    { x: .30, y: .08, r:.36, a:.095 }, { x:-.14, y: .36, r:.27, a:.075 },
-    { x:-.48, y: .12, r:.19, a:.060 }, { x: .06, y:-.04, r:.17, a:.055 },
-    { x: .40, y:-.34, r:.14, a:.045 },
+    { x:-.34, y:-.36, rx:.34, ry:.27, 轉:-.30, a:.50 },   // 雨海 Imbrium
+    { x: .02, y:-.34, rx:.20, ry:.17, 轉: .10, a:.48 },   // 澄海 Serenitatis
+    { x: .24, y:-.15, rx:.22, ry:.19, 轉: .20, a:.46 },   // 靜海 Tranquillitatis
+    { x: .61, y:-.27, rx:.13, ry:.10, 轉: .00, a:.44 },   // 危海 Crisium
+    { x: .42, y: .07, rx:.15, ry:.19, 轉: .00, a:.42 },   // 豐海 Fecunditatis
+    { x: .27, y: .18, rx:.10, ry:.09, 轉: .00, a:.38 },   // 酒海 Nectaris
+    { x:-.55, y: .02, rx:.29, ry:.41, 轉: .10, a:.40 },   // 風暴洋 Procellarum
+    { x:-.22, y: .36, rx:.19, ry:.12, 轉:-.10, a:.36 },   // 雲海 Nubium
+    { x:-.43, y: .34, rx:.11, ry:.10, 轉: .00, a:.34 },   // 濕海 Humorum
+    { x:-.12, y:-.66, rx:.33, ry:.07, 轉: .05, a:.28 },   // 冷海 Frigoris
   ];
+  // 固定種子的亂數——每次重畫都要是同一顆月亮，不能每次長不一樣
+  const 亂數 = (種 => () => ((種 = (種 * 1664525 + 1013904223) >>> 0) / 4294967296))(20260912);
+
+  // 有輻射紋的亮坑。第谷那一圈白線，是滿月時最搶眼的特徵。
+  // ⚠️ 紋路長度要先算好存起來——如果在畫的時候才 亂數()，每次重畫長度都不同，會閃。
+  const 亮坑 = [{ x:-.10, y: .60, r:.050, 紋:.80 }, { x:-.20, y:-.05, r:.040, 紋:.34 }]
+    .map(b => ({ ...b, 線: Array.from({ length: 26 }, (_, i) =>
+      ({ 角: i / 26 * 6.2832 + b.x, 倍: 5 + 亂數() * 11 })) }));
+  const 隕石坑 = Array.from({ length: 150 }, () => {
+    const 角 = 亂數() * 6.2832, 距 = Math.sqrt(亂數()) * .95;   // 開根號才會鋪得均勻
+    return { x: Math.cos(角) * 距, y: Math.sin(角) * 距,
+             r: .009 + Math.pow(亂數(), 2.6) * .075, 深: .35 + 亂數() * .6 };
+  });
+
+  // 顆粒：128×128 的雜訊小磚，之後用 pattern 鋪滿月面
+  const 顆粒 = (() => {
+    const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+    const cx2 = cv.getContext('2d'), img = cx2.createImageData(128, 128);
+    for (let i = 0; i < img.data.length; i += 4){
+      const v = 亂數() * 255;
+      img.data[i] = img.data[i+1] = img.data[i+2] = v;
+      img.data[i+3] = 26;
+    }
+    cx2.putImageData(img, 0, 0);
+    return cv;
+  })();
+
+  // phase：0＝新月、.25＝上弦、.5＝滿月、.75＝下弦
 
   // phase：0＝新月、.25＝上弦、.5＝滿月、.75＝下弦
   function 畫月(c, cx, cy, R, phase, alpha){
@@ -627,21 +668,63 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
     c.ellipse(cx, cy, R * Math.abs(cos), R, 0, 盈 ? Math.PI / 2 : -Math.PI / 2, 盈 ? -Math.PI / 2 : Math.PI / 2, cos > 0);
     c.closePath(); c.clip();
 
-    // 球面的明暗：光來的那一側最白，往反邊的緣落下去
-    const 光 = c.createRadialGradient(cx + (盈 ? R * .40 : -R * .40), cy - R * .20, R * .04, cx, cy, R * 1.14);
-    光.addColorStop(0, '#FAF4EA'); 光.addColorStop(.5, '#F0E5D4');
-    光.addColorStop(.82, '#E2D2BB'); 光.addColorStop(1, '#CFBCA3');
+    // 球面的明暗：光來的那一側最亮，往反邊的緣落下去
+    const 向光 = 盈 ? 1 : -1;
+    const 光 = c.createRadialGradient(cx + 向光 * R * .40, cy - R * .20, R * .04, cx, cy, R * 1.14);
+    光.addColorStop(0, '#FAF4E6'); 光.addColorStop(.5, '#EEE2CA');
+    光.addColorStop(.82, '#DAC7A4'); 光.addColorStop(1, '#BCA47E');
     c.fillStyle = 光; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
 
-    // 月海。位置固定，所以每次升起來都是同一張臉；太小就不畫，會糊成一團
-    if (R > 46) for (const m of 月海){
-      const mx = cx + m.x * R, my = cy + m.y * R, mr = m.r * R;
-      const g = c.createRadialGradient(mx, my, 0, mx, my, mr);
-      g.addColorStop(0, `rgba(120,112,138,${m.a})`);
-      g.addColorStop(.7, `rgba(120,112,138,${(m.a * .45).toFixed(3)})`);
-      g.addColorStop(1, 'rgba(120,112,138,0)');
-      c.fillStyle = g; c.beginPath(); c.arc(mx, my, mr, 0, 7); c.fill();
+    if (R > 40){
+      // 月海：帶藍的暗斑，邊緣要糊，真正的月海沒有硬邊
+      for (const m of 月海){
+        c.save();
+        c.translate(cx + m.x * R, cy + m.y * R); c.rotate(m.轉); c.scale(m.rx * R, m.ry * R);
+        const g = c.createRadialGradient(0, 0, 0, 0, 0, 1);
+        g.addColorStop(0, `rgba(150,130,112,${m.a})`);
+        g.addColorStop(.62, `rgba(150,130,112,${(m.a * .74).toFixed(3)})`);
+        g.addColorStop(1, 'rgba(150,130,112,0)');
+        c.fillStyle = g; c.beginPath(); c.arc(0, 0, 1, 0, 7); c.fill();
+        c.restore();
+      }
+
+      // 小隕石坑：坑底暗、向光那側的坑緣亮。這兩筆就夠讓表面有起伏
+      for (const k of 隕石坑){
+        const kx = cx + k.x * R, ky = cy + k.y * R, kr = k.r * R;
+        if (kr < .8) continue;
+        c.beginPath(); c.arc(kx, ky, kr, 0, 7);
+        c.fillStyle = `rgba(132,112,92,${(.16 * k.深).toFixed(3)})`; c.fill();
+        c.beginPath(); c.arc(kx - 向光 * kr * .12, ky - kr * .1, kr * .93, 0, 7);
+        c.strokeStyle = `rgba(255,250,238,${(.22 * k.深).toFixed(3)})`;
+        c.lineWidth = Math.max(.5, kr * .16); c.stroke();
+      }
+
+      // 亮坑與輻射紋（第谷、哥白尼）
+      for (const b of 亮坑){
+        const bx = cx + b.x * R, by = cy + b.y * R, br = b.r * R;
+        for (const 線 of b.線){
+          const a = 線.角, 長 = br * 線.倍 * b.紋;
+          const g = c.createLinearGradient(bx, by, bx + Math.cos(a) * 長, by + Math.sin(a) * 長);
+          g.addColorStop(0, `rgba(255,252,242,${(.16 * b.紋).toFixed(3)})`);
+          g.addColorStop(1, 'rgba(255,252,242,0)');
+          c.strokeStyle = g; c.lineWidth = Math.max(.6, br * .16);
+          c.beginPath(); c.moveTo(bx, by); c.lineTo(bx + Math.cos(a) * 長, by + Math.sin(a) * 長); c.stroke();
+        }
+        c.beginPath(); c.arc(bx, by, br, 0, 7);
+        c.fillStyle = 'rgba(255,253,246,.32)'; c.fill();
+      }
+
+      // 顆粒。一點雜訊，畫面才不會是塑膠感的平滑
+      c.save();
+      c.globalAlpha = .55; c.fillStyle = c.createPattern(顆粒, 'repeat');
+      c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
+      c.restore();
     }
+
+    // 邊緣暗一點，把球撐起來
+    const 邊暗 = c.createRadialGradient(cx, cy, R * .72, cx, cy, R);
+    邊暗.addColorStop(0, 'rgba(74,58,40,0)'); 邊暗.addColorStop(1, 'rgba(74,58,40,.30)');
+    c.fillStyle = 邊暗; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
 
     // 明暗交界柔化。半月時也不要出現一條硬邊
     const 寬 = Math.max(R * Math.abs(cos), R * .16);
@@ -658,7 +741,7 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
   const 月布 = document.createElement('canvas');
   let 月快取 = { 相: -9, 濃: -9, R: -9, 邊: 0 };
   function 取月(R, 相, 濃){
-    if (月快取.R !== R || Math.abs(月快取.相 - 相) > .008 || Math.abs(月快取.濃 - 濃) > .025){
+    if (月快取.R !== R || Math.abs(月快取.相 - 相) > .012 || Math.abs(月快取.濃 - 濃) > .025){
       const 邊 = Math.ceil(R * 6.6);                // 容得下最外圈 3.2R 的光暈
       月布.width = 月布.height = 邊;
       畫月(月布.getContext('2d'), 邊 / 2, 邊 / 2, R, 相, 濃);
