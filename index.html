@@ -652,21 +652,13 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
     c.strokeStyle = `rgba(248,241,230,${(.05 * 亮度 + .018).toFixed(3)})`;
     c.lineWidth = Math.max(1, R * .011); c.stroke();
 
-    // 暗面＝地球反照。帶一點藍的闇，讓它看起來是顆球，不是貼紙
-    const 暗 = c.createRadialGradient(cx - R * .28, cy - R * .28, R * .05, cx, cy, R * 1.05);
-    暗.addColorStop(0, 'rgba(158,152,190,.22)');
-    暗.addColorStop(.6, 'rgba(128,122,158,.13)');
-    暗.addColorStop(1, 'rgba(96,92,124,.07)');
-    c.fillStyle = 暗; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
-    // 暗面的邊。有這條線，才看得出來是「圓的」
-    c.beginPath(); c.arc(cx, cy, R - Math.max(.5, R * .006), 0, 7);
-    c.strokeStyle = 'rgba(248,241,230,.20)'; c.lineWidth = Math.max(.7, R * .008); c.stroke();
-
-    // 亮面：半圓 + 一段橢圓，就是月相的形狀
-    c.save(); c.beginPath();
-    c.arc(cx, cy, R, 盈 ? -Math.PI / 2 : Math.PI / 2, 盈 ? Math.PI / 2 : -Math.PI / 2, false);
-    c.ellipse(cx, cy, R * Math.abs(cos), R, 0, 盈 ? Math.PI / 2 : -Math.PI / 2, 盈 ? -Math.PI / 2 : Math.PI / 2, cos > 0);
-    c.closePath(); c.clip();
+    /* 這裡的順序很關鍵。
+       以前是「先畫一塊平的暗圓盤，再把有紋理的亮面貼上去」——那看起來就是
+       一張遮罩貼紙：暗的那半是死的，還帶一圈硬邊。
+       改成「先畫完整的一顆月亮，再讓陰影蓋上去」：暗的那半仍然透出同一張臉，
+       也就是地球反照（the old moon in the new moon's arms）。 */
+    c.save();
+    c.beginPath(); c.arc(cx, cy, R, 0, 7); c.clip();
 
     // 球面的明暗：光來的那一側最亮，往反邊的緣落下去
     const 向光 = 盈 ? 1 : -1;
@@ -726,14 +718,37 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
     邊暗.addColorStop(0, 'rgba(74,58,40,0)'); 邊暗.addColorStop(1, 'rgba(74,58,40,.30)');
     c.fillStyle = 邊暗; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
 
-    // 明暗交界柔化。半月時也不要出現一條硬邊
-    const 寬 = Math.max(R * Math.abs(cos), R * .16);
-    const 交界 = c.createLinearGradient(cx - 寬, cy, cx + 寬, cy);
-    if (盈){ 交界.addColorStop(0, 'rgba(24,20,34,.34)'); 交界.addColorStop(.45, 'rgba(24,20,34,.10)'); 交界.addColorStop(1, 'rgba(24,20,34,0)'); }
-    else   { 交界.addColorStop(0, 'rgba(24,20,34,0)'); 交界.addColorStop(.55, 'rgba(24,20,34,.10)'); 交界.addColorStop(1, 'rgba(24,20,34,.34)'); }
+    /* ── 讓陰影蓋上來 ──
+       先描出「被照亮的那一塊」（半圓＋一段橢圓），再用 evenodd 取它的補集，
+       就是該暗下去的區域。地球反照留一點，所以不是全黑——越接近新月留得越多，
+       那是真的：新月前後地球把陽光反射回月球，最亮。 */
+    const 影濃 = .93 - .09 * (1 - 亮度);
+    c.beginPath();
+    c.arc(cx, cy, R, 0, 7);                                        // 整個圓
+    c.moveTo(cx, cy - R);                                          // 亮面當成內圈子路徑
+    c.arc(cx, cy, R, 盈 ? -Math.PI / 2 : Math.PI / 2, 盈 ? Math.PI / 2 : -Math.PI / 2, false);
+    c.ellipse(cx, cy, R * Math.abs(cos), R, 0, 盈 ? Math.PI / 2 : -Math.PI / 2, 盈 ? -Math.PI / 2 : Math.PI / 2, cos > 0);
+    c.closePath();
+    c.fillStyle = `rgba(16,15,24,${影濃.toFixed(3)})`;
+    c.fill('evenodd');
+
+    /* 明暗交界柔化。真正的晨昏線不是一刀切——尤其細月的時候，
+       那一帶是慢慢暗下去的。用一條橫向漸層壓在交界上。 */
+    const 界x = cx + (盈 ? -1 : 1) * R * Math.abs(cos);             // 交界大致的位置
+    const 糊 = Math.max(R * .13, R * .30 * (1 - Math.abs(cos)));
+    const 交界 = c.createLinearGradient(界x - 糊, cy, 界x + 糊, cy);
+    if (盈){ 交界.addColorStop(0, 'rgba(16,15,24,.30)'); 交界.addColorStop(1, 'rgba(16,15,24,0)'); }
+    else   { 交界.addColorStop(0, 'rgba(16,15,24,0)'); 交界.addColorStop(1, 'rgba(16,15,24,.30)'); }
     c.fillStyle = 交界; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
 
-    c.restore(); c.restore();
+    c.restore();
+
+    // 暗面外緣極細的一圈冷光。有它，暗的那半才不會消失在夜空裡
+    c.beginPath(); c.arc(cx, cy, R - Math.max(.4, R * .004), 0, 7);
+    c.strokeStyle = `rgba(176,184,214,${(.10 + .05 * (1 - 亮度)).toFixed(3)})`;
+    c.lineWidth = Math.max(.6, R * .006); c.stroke();
+
+    c.restore();
   }
 
   /* 月亮很貴——三層 radial gradient＋球面漸層，每幀重畫會讓手機發燙。
@@ -758,8 +773,8 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
   function 畫(t){
     const p = 捲動比例();
     // 從頭捲到底＝從一彎細細的月，長到滿月。
-    // 起點刻意不用正零——全黑的新月在畫面上只剩一團光暈，少了那道弦就沒東西可看。
-    const 相 = .055 + p * .445;
+    // 起點刻意不用正零，也不能太細——弦太窄的話畫面上只剩一塊灰圓盤，沒東西可看。
+    const 相 = .10 + p * .40;
     // 進入內文後讓月亮退開，字才好讀；越接近頁尾再退一點，把版面讓給圖騰與徽記
     const 濃 = (.70 - .32 * Math.min(scrollY / (innerHeight * .9), 1)) * (1 - .28 * p);
 

@@ -1,6 +1,6 @@
 // 讓「加到主畫面」之後，沒有網路也打得開。
 // 改版時把 版本 的數字 +1，使用者下次開就會拿到新的。
-const 版本 = 'cycle-compass-v6';
+const 版本 = 'cycle-compass-v7';
 const 要存的 = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './wm-logo.png', './milliya-icon.png'];
 
 self.addEventListener('install', e => {
