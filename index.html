@@ -553,14 +553,14 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
   }
 
   // phase：0＝新月、.25＝上弦、.5＝滿月、.75＝下弦
-  function 畫月(cx, cy, R, phase, alpha){
+  function 畫月(c, cx, cy, R, phase, alpha){
     const cos = Math.cos(2 * Math.PI * phase);      // +1 新月、0 半月、-1 滿月
     const 盈 = phase < .5;
     const 亮度 = (1 - cos) / 2;
     c.save(); c.globalAlpha = alpha;
 
     // 光暈三層，越亮的月暈越開
-    [[1.7, '248,241,230', .12], [2.9, '226,155,134', .05], [4.6, '186,178,214', .03]].forEach(([倍, 色, 強]) => {
+    [[1.7, '248,241,230', .12], [2.5, '226,155,134', .05], [3.2, '186,178,214', .03]].forEach(([倍, 色, 強]) => {
       const g = c.createRadialGradient(cx, cy, R * (倍 - .7), cx, cy, R * 倍);
       g.addColorStop(0, `rgba(${色},${(強 * 亮度 + 強 * .35).toFixed(3)})`);
       g.addColorStop(1, `rgba(${色},0)`);
@@ -584,6 +584,20 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
     光.addColorStop(.82, '#E2D2BB'); 光.addColorStop(1, '#CFBCA3');
     c.fillStyle = 光; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
     c.restore(); c.restore();
+  }
+
+  /* 月亮很貴——三層 radial gradient＋球面漸層，每幀重畫會讓手機發燙。
+     所以先畫到一張離畫面的小畫布存著，只有相位或濃淡真的變了才重畫。 */
+  const 月布 = document.createElement('canvas');
+  let 月快取 = { 相: -9, 濃: -9, R: -9, 邊: 0 };
+  function 取月(R, 相, 濃){
+    if (月快取.R !== R || Math.abs(月快取.相 - 相) > .008 || Math.abs(月快取.濃 - 濃) > .025){
+      const 邊 = Math.ceil(R * 6.6);                // 容得下最外圈 3.2R 的光暈
+      月布.width = 月布.height = 邊;
+      畫月(月布.getContext('2d'), 邊 / 2, 邊 / 2, R, 相, 濃);
+      月快取 = { 相, 濃, R, 邊 };
+    }
+    return 月快取.邊;
   }
 
   function 捲動比例(){
@@ -612,16 +626,23 @@ document.getElementById('三圖').innerHTML = 三門檻.map(m => `
       c.fillStyle = `rgba(242,231,216,${(st.a * 閃 * (1 - p * .35)).toFixed(3)})`;
       c.fill();
     }
-    畫月(月X, 月Y + 視差 * 1.6, 月R, 相, Math.max(濃, .1));
+    const 邊 = 取月(月R, 相, Math.max(濃, .1));
+    c.drawImage(月布, 月X - 邊 / 2, 月Y + 視差 * 1.6 - 邊 / 2);
   }
 
   let 排程 = null;
   function 重畫(){ if (!排程) 排程 = requestAnimationFrame(t => { 排程 = null; 畫(t); }); }
 
   建置(); 畫(0);
-  addEventListener('resize', () => { 建置(); 重畫(); });
+  addEventListener('resize', () => { 月快取.R = -9; 建置(); 重畫(); });
   addEventListener('scroll', 重畫, { passive: true });
-  if (!少動) (function 動(t){ 畫(t); requestAnimationFrame(動); })(0);
+
+  // 星星的呼吸壓在 30fps 就夠柔和了，不用追著螢幕更新率跑
+  if (!少動) (function 動(t){
+    requestAnimationFrame(動);
+    if (t - (動.上次 || 0) < 33) return;
+    動.上次 = t; 畫(t);
+  })(0);
 })();
 
 /* ════════ 可以加到主畫面 ════════ */
