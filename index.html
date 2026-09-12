@@ -23,13 +23,25 @@
   html{-webkit-text-size-adjust:100%}
   body{
     margin:0; min-height:100svh;
+    /* --暈 由 JS 隨捲動改變：越往下，夜色越暖 */
+    --暈:#251F35;
     background:var(--ink);
-    background-image:radial-gradient(ellipse 90% 60% at 76% 18%, #251F35 0%, #191527 42%, #14121C 100%);
+    background-image:radial-gradient(ellipse 90% 60% at 76% 18%, var(--暈) 0%, #191527 42%, #14121C 100%);
     background-attachment:fixed;
     color:var(--moon); font-family:var(--mincho);
     font-size:16px; line-height:2.05; letter-spacing:.04em;
   }
-  .col{width:100%; max-width:34rem; margin-inline:auto; padding:2.6rem 1.5rem 4rem;}
+  /* 背景的夜空與月亮。純裝飾，不擋點擊 */
+  #sky{position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none}
+  .col{position:relative; z-index:1; width:100%; max-width:34rem; margin-inline:auto; padding:2.6rem 1.5rem 4rem;
+       text-shadow:0 0 14px rgba(20,18,28,.9), 0 0 4px rgba(20,18,28,.7)}
+
+  /* 捲到了才浮現 */
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity 1s ease, transform 1s ease}
+  .reveal.來了{opacity:1; transform:none}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1; transform:none; transition:none}
+  }
   p{margin:0}
   h1{font-weight:500; font-size:1.6rem; letter-spacing:.16em; margin:0 0 .4rem; line-height:1.6}
   .eyebrow{font-family:var(--gothic); font-size:.66rem; font-weight:500;
@@ -86,7 +98,36 @@
   .alchemy{margin-top:1.4rem; padding:1.3rem 1.35rem; border-radius:2px;
            background:rgba(242,231,216,.045); border-left:2px solid var(--rose)}
   .alchemy h3{color:var(--rose)}
+  .block .sub{margin-top:.75rem; font-family:var(--gothic); font-size:.8rem;
+              line-height:1.95; color:var(--moon-dim)}
   .quote{margin-top:1.9rem; text-align:center; font-size:1.12rem; line-height:2; letter-spacing:.06em}
+
+  /* ── 血的三道門檻 ── */
+  .門檻{margin-top:4.2rem; padding-top:2.4rem; border-top:1px solid var(--line)}
+  .門檻 > .eyebrow{text-align:center}
+  .門檻 > h2{margin:0 0 .5rem; text-align:center; font-weight:500;
+             font-size:1.2rem; letter-spacing:.2em; line-height:1.7}
+  .門檻 > .lede{text-align:center; margin-bottom:2.4rem}
+  .三圖{display:grid; grid-template-columns:1fr; gap:2.2rem}
+  @media(min-width:560px){ .三圖{grid-template-columns:repeat(3,1fr); gap:1.4rem} }
+  .圖騰{text-align:center}
+  /* stroke 要下在 svg 上讓子元素繼承——下在 [stroke] 選不到，因為路徑本身沒有這個屬性 */
+  .圖騰 svg{width:82px; height:82px; display:block; margin:0 auto .9rem;
+            stroke:var(--gold); opacity:.82}
+  .圖騰 h3{margin:0 0 .45rem; font-weight:500; font-size:1rem; letter-spacing:.16em}
+  .圖騰 .en{font-family:var(--gothic); font-size:.6rem; letter-spacing:.22em;
+            text-transform:uppercase; color:var(--rose); display:block; margin-bottom:.55rem}
+  .圖騰 p{font-size:.85rem; line-height:2; color:var(--moon-dim)}
+
+  /* ── Womb-Moon 徽記 ── */
+  /* 月亮會飄到這一帶，所以給徽記一圈自己的暗場，不然白線會被月光吃掉 */
+  .徽記{position:relative; margin-top:4.4rem; text-align:center}
+  .徽記::before{content:""; position:absolute; left:50%; top:50%; translate:-50% -50%;
+                width:270px; height:270px; border-radius:50%; pointer-events:none;
+                background:radial-gradient(circle, rgba(20,18,28,.82) 0%, rgba(20,18,28,.55) 45%, rgba(20,18,28,0) 72%)}
+  .徽記 img, .徽記 p{position:relative}
+  .徽記 img{width:122px; height:auto; opacity:.72; margin-bottom:.9rem}
+  .徽記 p{font-family:var(--gothic); font-size:.66rem; letter-spacing:.24em; color:var(--moon-dim)}
   .quote::before,.quote::after{color:var(--gold); opacity:.6}
   .quote::before{content:"— "} .quote::after{content:" —"}
 
@@ -98,6 +139,7 @@
 </style>
 </head>
 <body>
+<canvas id="sky" aria-hidden="true"></canvas>
 <div class="col">
 
   <p class="eyebrow">Womb ・ Moon ・ Alchemy</p>
@@ -139,12 +181,40 @@
   <!-- ③ 結果 -->
   <div id="結果" class="hidden"></div>
 
+  <!-- ④ 血的三道門檻 -->
+  <section class="門檻">
+    <p class="eyebrow reveal">The Blood Mysteries</p>
+    <h2 class="reveal">血的三道門檻</h2>
+    <p class="lede reveal">
+      一個女人一生會走過三次「血改變了」的時刻。<br>
+      每個月的那一輪，是同一件事的小版本。
+    </p>
+    <div class="三圖" id="三圖"></div>
+  </section>
+
+  <div class="徽記 reveal">
+    <img src="wm-logo.png" alt="Womb-Moon" width="520" height="557" loading="lazy">
+    <p>WOMB ・ MOON ・ ALCHEMY</p>
+  </div>
+
   <footer>
     <p>
       <strong>這張地圖的來源。</strong>
       四夜的命名與精神，來自卓雅老師（Zoya Lu）的 Womb-Moon 月亮煉金術；
-      四個原型的架構出自 Miranda Gray《Red Moon》（1994）。
+      四個原型的架構出自 Miranda Gray《Red Moon》（1994）；
+      「血的三道門檻」沿用女性靈性傳統裡的 Blood Mysteries，
+      這個說法在助產師 Jane Hardwicke Collings《Blood Rites》與她創辦的
+      School of Shamanic Womancraft 裡談得最完整。
       文字是我自己寫的，錯的地方算我的。
+    </p>
+    <p style="margin-top:.9rem">
+      <strong>飲食那一段的證據強弱不一樣，我分開講。</strong>
+      鈣對經前症候群，有多個隨機對照試驗和統合分析支持，是最硬的一項；
+      鎂的證據目前不足，我沒有把它寫成有效。
+      「種子循環」2025 年有一篇涵蓋 10 篇研究、635 人的系統性回顧看到正向訊號，
+      但那些研究測的多半是<strong>單一種子本身</strong>，不是「照週期輪替」這個規則——
+      所以吃那些種子是好的，不用為了日期焦慮。
+      至於阿育吠陀的 Vāta（瓦塔）說法，那是傳統理論，不是臨床研究，我標出來讓妳自己判斷。
     </p>
     <p style="margin-top:.9rem">
       <strong>三個誠實的但書。</strong>
@@ -169,6 +239,8 @@ const 四夜 = [
     適合:'獨處、睡飽、熱敷肚子、把行事曆留白、寫下上個月真正發生了什麼。',
     別逼:'開會做決定、開始新的東西、勉強社交、逼自己「要有效率」。',
     煉金:'這幾天冒出來的疲憊，先別急著修好它。只問一句：「我到底累了多久了？」寫下來就好，不用解決。',
+    餐桌:'溫的、熟的、帶一點油的。深綠葉菜、紅肉或豆類配一點維生素 C（血流出去，鐵也跟著走）、薑湯、紅棗。',
+    少碰:'冰的、生的、過量咖啡因。阿育吠陀說這幾天 Vāta（瓦塔・風元素）最強，身體既怕冷也怕乾——所以要溫、要潤。',
     一句話:'什麼都不用開始。妳正在把上一輪還沒消化完的，還給身體。'
   },
   {
@@ -179,6 +251,8 @@ const 四夜 = [
     適合:'開新的東西、學新的東西、排需要腦力的工作、試沒做過的事。',
     別逼:'別因為「終於有力氣了」，就把整個月的事全塞進這一週。',
     煉金:'找一件「上個月沒力氣做、現在有了」的事，只做那一件。已經動起來的妳，和還沒動的妳，兩個都留在場上。',
+    餐桌:'新鮮、輕、帶一點發酵的。芽菜、莓果、優格或泡菜，配一匙亞麻籽與南瓜籽。身體正在造雌激素，需要好的脂肪和夠的蛋白質。',
+    少碰:'沒什麼特別要避開的。這是四個階段裡消化最順的幾天，可以放心試新東西。',
     一句話:'一半亮、一半暗，是正常的。不用等到全亮才開始。'
   },
   {
@@ -189,6 +263,8 @@ const 四夜 = [
     適合:'見人、談合作、拍照、把想說的話說出口、需要被看見的場合。',
     別逼:'別把「這幾天特別有魅力」當成一種義務。也別在一直給出去的時候，忘記留一份給自己。',
     煉金:'如果這幾天有什麼情緒被照出來，那不是妳失控，是滿月讓它藏不住。看它一眼就好，不用馬上處理。',
+    餐桌:'顏色多的，生的也可以。彩椒、莓果、十字花科（花椰菜、高麗菜、羽衣甘藍）幫肝臟代謝掉用完的雌激素。水要喝夠。',
+    少碰:'這幾天精神最好，也最容易忘記吃飯。不是要妳避開什麼，是別跳過正餐。',
     一句話:'妳現在特別容易被聽見。那就挑妳真正想說的話講。'
   },
   {
@@ -199,6 +275,8 @@ const 四夜 = [
     適合:'收尾、整理、把前面開的頭做完、獨處、對自己誠實。',
     別逼:'別在這幾天檢討自己的人生。也別把情緒當成「我是不是壞掉了」的證據。',
     煉金:'經前冒出來的那些話，寫下來，但先不要傳出去。等新月那天再讀一次——留下真的，刪掉氣話。',
+    餐桌:'鈣——這是整張表裡證據最硬的一項，多個隨機對照試驗看到它能減輕經前症候群。再加複合碳水（地瓜、糙米）、堅果、黑巧克力、芝麻與葵花籽。',
+    少碰:'極端節食。黃體期的基礎代謝本來就比較高，妳是真的比較餓，不是意志力變差。',
     一句話:'經前冒出來的那些話，通常不是假的——只是平常被妳壓住了。'
   },
 ];
@@ -298,6 +376,29 @@ function 畫羅盤(邊界, 進度, 現在索引){
   document.getElementById('羅盤').innerHTML = s;
 }
 
+/* ════════ 捲到了才浮現 ════════
+   （定義得比 顯示() 早，因為一開機從記憶還原時就會用到它）
+
+   這裡刻意「不用」IntersectionObserver：如果一口氣跳過某個元素
+   （手機慣性滑動、或程式直接跳位），它會從「在下面沒相交」變成「在上面沒相交」，
+   相交比例一直是 0、不算變化，回呼就不會被呼叫——那段文字會永遠停在透明。
+   直接量位置反而穩。 */
+let 待浮現 = [];
+function 檢查淡入(){
+  if (!待浮現.length) return;
+  const 線 = innerHeight * .88;
+  待浮現 = 待浮現.filter(el => {
+    if (el.getBoundingClientRect().top < 線){ el.classList.add('來了'); return false; }
+    return true;                                   // 還在線下面，下次再看
+  });
+}
+function 綁定淡入(){
+  待浮現 = [...document.querySelectorAll('.reveal:not(.來了)')];
+  檢查淡入();
+}
+addEventListener('scroll', 檢查淡入, { passive: true });
+addEventListener('resize', 檢查淡入);
+
 /* ════════ 顯示 ════════ */
 function 顯示(索引, 何時){
   const 夜 = 四夜[索引];
@@ -309,13 +410,15 @@ function 顯示(索引, 何時){
       <div class="arche">${夜.原型}　${夜.原型英}</div>
       <p class="when">${何時}</p>
     </div>
-    <div class="block"><h3>${是月亮模式 ? '今晚的月亮' : '內在的月相'}</h3><p>${夜.月亮}</p></div>
-    <div class="block"><h3>${是月亮模式 ? '這幾天可以留意' : '身體在做什麼'}</h3><p>${是月亮模式 ? 夜.留意 : 夜.身體}</p></div>
-    <div class="block"><h3>適合做什麼</h3><p>${夜.適合}</p></div>
-    <div class="block"><h3>別逼自己</h3><p>${夜.別逼}</p></div>
-    <div class="alchemy"><h3>今夜的煉金</h3><p>${夜.煉金}</p></div>
-    <p class="quote">${夜.一句話}</p>
+    <div class="block reveal"><h3>${是月亮模式 ? '今晚的月亮' : '內在的月相'}</h3><p>${夜.月亮}</p></div>
+    <div class="block reveal"><h3>${是月亮模式 ? '這幾天可以留意' : '身體在做什麼'}</h3><p>${是月亮模式 ? 夜.留意 : 夜.身體}</p></div>
+    <div class="block reveal"><h3>適合做什麼</h3><p>${夜.適合}</p></div>
+    <div class="block reveal"><h3>別逼自己</h3><p>${夜.別逼}</p></div>
+    <div class="block reveal"><h3>這幾天的餐桌</h3><p>${夜.餐桌}</p><p class="sub">${夜.少碰}</p></div>
+    <div class="alchemy reveal"><h3>今夜的煉金</h3><p>${夜.煉金}</p></div>
+    <p class="quote reveal">${夜.一句話}</p>
   `;
+  綁定淡入();
 }
 
 /* ════════ 身體模式 ════════ */
@@ -396,6 +499,130 @@ try {
     算身體();
   }
 } catch (e) { /* 無痕模式讀不到 localStorage，那就當第一次打開 */ }
+
+/* ════════ 血的三道門檻：三個圖騰 ════════ */
+const 螺旋路徑 = (() => {                            // 阿基米德螺線：轉出去，但不回到原點
+  let d = '';
+  for (let i = 0; i <= 110; i++){
+    const θ = i / 110 * 4.2 * Math.PI, r = θ * 1.62;
+    d += (i ? 'L' : 'M') + (40 + r * Math.cos(θ)).toFixed(1) + ' ' + (40 + r * Math.sin(θ)).toFixed(1);
+  }
+  return d;
+})();
+
+const 三門檻 = [
+  { 名:'初經', 英:'Menarche', 說:'血第一次來。那天之後，女孩知道自己身體裡有一個房間，而且它會自己開關。',
+    圖:`<path d="M40 12 A28 28 0 1 0 40 68 A21 28 0 1 1 40 12Z"/>
+        <path d="M40 74 c-4.2 5.4 -6.4 7.8 -6.4 10.4" transform="translate(0,-8)"/>
+        <path d="M40 66.5 c-3.6 4.6 -5.4 6.6 -5.4 8.8 a5.4 5.4 0 0 0 10.8 0 c0-2.2 -1.8-4.2 -5.4-8.8Z"/>` },
+  { 名:'生產', 英:'Birth', 說:'血跟水一起來。兩個圓交會的地方打開，另一個人從那裡走出去——那道門，所有人都走過。',
+    圖:`<circle cx="28" cy="40" r="19"/><circle cx="52" cy="40" r="19"/>
+        <path d="M40 21.5 A19 19 0 0 1 40 58.5 A19 19 0 0 1 40 21.5Z" stroke-width="1.6"/>
+        <circle cx="40" cy="40" r="3.2"/>` },
+  { 名:'停經', 英:'Menopause', 說:'血不再流出去了。它留在裡面，變成別的東西。老嫗不是失去了什麼，是終於不用每個月把它交出來。',
+    圖:`<circle cx="40" cy="40" r="30"/><path d="${螺旋路徑}"/>` },
+];
+
+document.getElementById('三圖').innerHTML = 三門檻.map(m => `
+  <div class="圖騰 reveal">
+    <svg viewBox="0 0 80 80" fill="none" stroke-width="1.15" stroke-linecap="round" aria-hidden="true">${m.圖}</svg>
+    <h3>${m.名}</h3><span class="en">${m.英}</span>
+    <p>${m.說}</p>
+  </div>`).join('');
+
+綁定淡入();
+
+/* ════════ 背景的夜空：往下滑，月亮會滿起來，夜色也跟著變暖 ════════ */
+(function 夜空(){
+  const 少動 = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const 畫布 = document.getElementById('sky'), c = 畫布.getContext('2d');
+  let 星 = [], 寬 = 0, 高 = 0, 月R = 0, 月X = 0, 月Y = 0;
+
+  function 建置(){
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    寬 = 畫布.clientWidth; 高 = 畫布.clientHeight;
+    畫布.width = 寬 * dpr; 畫布.height = 高 * dpr;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    星 = Array.from({ length: Math.round(Math.min(寬 * 高 / 5600, 260)) }, () => ({
+      x: Math.random() * 寬, y: Math.random() * 高,
+      r: Math.random() * 1 + .3, a: Math.random() * .5 + .25,
+      速: Math.random() * .0015 + .0004, 相: Math.random() * Math.PI * 2,
+    }));
+    月R = Math.max(72, Math.min(Math.min(寬, 高) * .21, 172));
+    月X = 寬 * .72; 月Y = 高 * .3;
+  }
+
+  // phase：0＝新月、.25＝上弦、.5＝滿月、.75＝下弦
+  function 畫月(cx, cy, R, phase, alpha){
+    const cos = Math.cos(2 * Math.PI * phase);      // +1 新月、0 半月、-1 滿月
+    const 盈 = phase < .5;
+    const 亮度 = (1 - cos) / 2;
+    c.save(); c.globalAlpha = alpha;
+
+    // 光暈三層，越亮的月暈越開
+    [[1.7, '248,241,230', .12], [2.9, '226,155,134', .05], [4.6, '186,178,214', .03]].forEach(([倍, 色, 強]) => {
+      const g = c.createRadialGradient(cx, cy, R * (倍 - .7), cx, cy, R * 倍);
+      g.addColorStop(0, `rgba(${色},${(強 * 亮度 + 強 * .35).toFixed(3)})`);
+      g.addColorStop(1, `rgba(${色},0)`);
+      c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R * 倍, 0, 7); c.fill();
+    });
+
+    // 暗面＝地球反照，帶一點藍，讓它看起來是顆球而不是貼紙
+    const 暗 = c.createRadialGradient(cx - R * .28, cy - R * .28, R * .05, cx, cy, R * 1.05);
+    暗.addColorStop(0, 'rgba(158,152,190,.20)'); 暗.addColorStop(1, 'rgba(96,92,124,.06)');
+    c.fillStyle = 暗; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
+    c.beginPath(); c.arc(cx, cy, R - .6, 0, 7);
+    c.strokeStyle = 'rgba(248,241,230,.14)'; c.lineWidth = Math.max(.7, R * .007); c.stroke();
+
+    // 亮面：半圓 + 一段橢圓，就是月相的形狀
+    c.save(); c.beginPath();
+    c.arc(cx, cy, R, 盈 ? -Math.PI / 2 : Math.PI / 2, 盈 ? Math.PI / 2 : -Math.PI / 2, false);
+    c.ellipse(cx, cy, R * Math.abs(cos), R, 0, 盈 ? Math.PI / 2 : -Math.PI / 2, 盈 ? -Math.PI / 2 : Math.PI / 2, cos > 0);
+    c.closePath(); c.clip();
+    const 光 = c.createRadialGradient(cx + (盈 ? R * .4 : -R * .4), cy - R * .2, R * .04, cx, cy, R * 1.14);
+    光.addColorStop(0, '#FAF4EA'); 光.addColorStop(.5, '#F0E5D4');
+    光.addColorStop(.82, '#E2D2BB'); 光.addColorStop(1, '#CFBCA3');
+    c.fillStyle = 光; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill();
+    c.restore(); c.restore();
+  }
+
+  function 捲動比例(){
+    const 全 = document.body.scrollHeight - innerHeight;
+    return 全 > 0 ? Math.min(Math.max(scrollY / 全, 0), 1) : 0;
+  }
+
+  function 畫(t){
+    const p = 捲動比例();
+    const 相 = p * .5;                               // 從頭捲到底＝新月走到滿月
+    // 進入內文後讓月亮退開，字才好讀；越接近頁尾再退一點，把版面讓給圖騰與徽記
+    const 濃 = (.58 - .3 * Math.min(scrollY / (innerHeight * .9), 1)) * (1 - .35 * p);
+
+    // 夜色跟著月亮變暖：越滿越暖
+    const 混 = (a, b) => Math.round(a + (b - a) * p);
+    document.body.style.setProperty('--暈',
+      `rgb(${混(0x25, 0x3B)},${混(0x1F, 0x28)},${混(0x35, 0x3A)})`);
+
+    c.clearRect(0, 0, 寬, 高);
+    const 視差 = 少動 ? 0 : -scrollY * .05;
+    for (const st of 星){
+      let y = st.y + 視差;
+      y = ((y % 高) + 高) % 高;                      // 星星捲出去就從另一邊回來
+      const 閃 = 少動 ? 1 : .62 + .38 * Math.sin(t * st.速 + st.相);
+      c.beginPath(); c.arc(st.x, y, st.r, 0, 7);
+      c.fillStyle = `rgba(242,231,216,${(st.a * 閃 * (1 - p * .35)).toFixed(3)})`;
+      c.fill();
+    }
+    畫月(月X, 月Y + 視差 * 1.6, 月R, 相, Math.max(濃, .1));
+  }
+
+  let 排程 = null;
+  function 重畫(){ if (!排程) 排程 = requestAnimationFrame(t => { 排程 = null; 畫(t); }); }
+
+  建置(); 畫(0);
+  addEventListener('resize', () => { 建置(); 重畫(); });
+  addEventListener('scroll', 重畫, { passive: true });
+  if (!少動) (function 動(t){ 畫(t); requestAnimationFrame(動); })(0);
+})();
 
 /* ════════ 可以加到主畫面 ════════ */
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
